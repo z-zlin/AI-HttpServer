@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智能AI助手</title>
+<style>
+    /* 全局样式 */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #87CEEB 0%, #4682B4 30%, #5F9EA0 60%, #87CEEB 100%);
+        background-size: 200% 200%;
+        animation: gradientShift 20s ease infinite;
+        color: #333;
+        position: relative;
+        overflow: hidden;
+    }
+
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    /* 背景装饰 */
+    body::before {
+        content: '';
+        position: absolute;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(135, 206, 235, 0.15) 0%, transparent 70%);
+        border-radius: 50%;
+        top: -200px;
+        right: -200px;
+        animation: float 25s ease-in-out infinite;
+    }
+
+    body::after {
+        content: '';
+        position: absolute;
+        width: 350px;
+        height: 350px;
+        background: radial-gradient(circle, rgba(70, 130, 180, 0.12) 0%, transparent 70%);
+        border-radius: 50%;
+        bottom: -175px;
+        left: -175px;
+        animation: float 30s ease-in-out infinite reverse;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translate(0, 0) rotate(0deg); }
+        50% { transform: translate(20px, -20px) rotate(180deg); }
+    }
+
+    .wrapper {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 420px;
+        padding: 20px;
+    }
+
+    h1.title {
+        font-size: 42px;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 40px;
+        color: #ffffff;
+        text-shadow: 0 2px 10px rgba(70, 130, 180, 0.5), 0 0 20px rgba(135, 206, 235, 0.3);
+        letter-spacing: 2px;
+        animation: titleFloat 3s ease-in-out infinite;
+    }
+
+    @keyframes titleFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-3px); }
+    }
+
+    .container {
+        width: 100%;
+        padding: 40px 35px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(70, 130, 180, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.5);
+        box-sizing: border-box;
+        text-align: center;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(15px) scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .container:hover {
+        box-shadow: 0 25px 70px rgba(70, 130, 180, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.6);
+        transform: translateY(-5px);
+    }
+
+    h2 {
+        font-size: 28px;
+        margin-bottom: 30px;
+        color: #4682B4;
+        font-weight: 600;
+        letter-spacing: 1px;
+    }
+
+    .form-group {
+        margin-bottom: 24px;
+        text-align: left;
+        position: relative;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 15px;
+        color: #555;
+        margin-bottom: 8px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 14px 16px;
+        font-size: 15px;
+        border: 2px solid #d0e8f2;
+        border-radius: 12px;
+        background: #fafafa;
+        outline: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-family: inherit;
+    }
+
+    .form-group input:hover {
+        border-color: #87CEEB;
+        background: #fff;
+    }
+
+    .form-group input:focus {
+        border-color: #4682B4;
+        box-shadow: 0 0 0 4px rgba(70, 130, 180, 0.1), 0 4px 12px rgba(70, 130, 180, 0.15);
+        background: #fff;
+        transform: translateY(-2px);
+    }
+
+    .btn {
+        width: 100%;
+        padding: 16px;
+        font-size: 17px;
+        background: linear-gradient(135deg, #4682B4 0%, #5F9EA0 100%);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        letter-spacing: 1px;
+        box-shadow: 0 4px 15px rgba(70, 130, 180, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.25);
+        transform: translate(-50%, -50%);
+        transition: width 0.5s, height 0.5s;
+    }
+
+    .btn:hover::before {
+        width: 250px;
+        height: 250px;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(70, 130, 180, 0.4);
+        background: linear-gradient(135deg, #5F9EA0 0%, #4682B4 100%);
+    }
+
+    .btn:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 8px rgba(70, 130, 180, 0.3);
+    }
+
+    .btn span {
+        position: relative;
+        z-index: 1;
+    }
+
+    .switch {
+        margin-top: 24px;
+        font-size: 14px;
+        color: #666;
+    }
+
+    .switch a {
+        color: #4682B4;
+        text-decoration: none;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s;
+        padding: 4px 8px;
+        border-radius: 6px;
+    }
+
+    .switch a:hover {
+        background: rgba(70, 130, 180, 0.15);
+        text-decoration: none;
+        color: #5F9EA0;
+    }
+
+    #register-container {
+        display: none;
+    }
+
+    /* 成功提示框 */
+    #success-alert {
+        position: fixed;
+        top: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, #4682B4 0%, #5F9EA0 100%);
+        color: #fff;
+        padding: 16px 32px;
+        border-radius: 12px;
+        box-shadow: 0 8px 25px rgba(70, 130, 180, 0.35);
+        display: none;
+        z-index: 1000;
+        font-weight: 600;
+        font-size: 15px;
+        letter-spacing: 0.5px;
+        animation: alertSlideIn 0.3s ease-out;
+    }
+
+    @keyframes alertSlideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-50%) translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    }
+
+    /* 响应式设计 */
+    @media (max-width: 480px) {
+        .wrapper {
+            padding: 10px;
+            max-width: 100%;
+        }
+
+        h1.title {
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            padding: 25px 20px;
+        }
+
+        h2 {
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+    }
+</style>
+</head>
+<body>
+<div id="success-alert">提示信息</div>
+
+<div class="wrapper">
+    <h1 class="title">智能AI助手</h1>
+
+    <!-- 登录 -->
+    <div class="container" id="login-container">
+        <h2>登录</h2>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="login-username">用户名</label>
+                <input type="text" id="login-username" placeholder="请输入用户名" required>
+            </div>
+            <div class="form-group">
+                <label for="login-password">密码</label>
+                <input type="password" id="login-password" placeholder="请输入密码" required>
+            </div>
+            <button type="submit" class="btn"><span>登录</span></button>
+        </form>
+        <div class="switch">
+            没有账号？<a onclick="showRegister()">去注册账号</a>
+        </div>
+    </div>
+
+    <!-- 注册 -->
+    <div class="container" id="register-container">
+        <h2>注册</h2>
+        <form id="register-form">
+            <div class="form-group">
+                <label for="register-username">用户名</label>
+                <input type="text" id="register-username" placeholder="请输入用户名" required>
+            </div>
+            <div class="form-group">
+                <label for="register-password">密码</label>
+                <input type="password" id="register-password" placeholder="请输入密码" required>
+            </div>
+            <button type="submit" class="btn"><span>注册</span></button>
+        </form>
+        <div class="switch">
+            已有账号？<a onclick="showLogin()">返回登录</a>
+        </div>
+    </div>
+</div>
+
+<script>
+function showAlert(message){
+    const alertBox = document.getElementById('success-alert');
+    alertBox.textContent = message;
+    alertBox.style.display = 'block';
+    setTimeout(()=>{alertBox.style.display='none';},1000);
+}
+function showRegister(){ document.getElementById('login-container').style.display='none'; document.getElementById('register-container').style.display='block'; }
+function showLogin(){ document.getElementById('register-container').style.display='none'; document.getElementById('login-container').style.display='block'; }
+
+// 登录
+document.getElementById('login-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    const username=document.getElementById('login-username').value;
+    const password=document.getElementById('login-password').value;
+
+    fetch('/login',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({username,password})
+    }).then(response=>{
+        if(response.status===403){ showAlert('账号已在其他地方登录！'); throw new Error('已在其他地方登录'); }
+        const contentType = response.headers.get('content-type');
+        if(response.status===200){
+            if(contentType && contentType.includes('application/json')) return response.json();
+            else throw new Error('返回格式错误');
+        }else if(response.status===401){ showAlert('账号或密码错误！'); throw new Error('认证失败'); }
+        else throw new Error('请求失败');
+    }).then(data=>{
+        if(data && data.userId){ sessionStorage.setItem('userId', data.userId); showAlert('登录成功！'); window.location.href='/menu'; }
+        else throw new Error('无效的响应数据');
+    }).catch(error=>{
+        console.error('Error:',error);
+        if(!error.message.includes('已在其他地方登录')&&!error.message.includes('认证失败')) showAlert('操作失败，请重试');
+    });
+});
+
+// 注册
+document.getElementById('register-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    const username=document.getElementById('register-username').value;
+    const password=document.getElementById('register-password').value;
+
+    fetch('/register',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({username,password})
+    }).then(response=>{
+        if(response.status===200){
+            showAlert('注册成功！');
+            document.getElementById('login-username').value=username;
+            document.getElementById('login-password').value=password;
+            setTimeout(showLogin,1000);
+        }else if(response.status===409){ alert('用户名已被注册，请重新输入！'); }
+    }).catch(error=>console.error('注册错误:',error));
+});
+</script>
+</body>
+</html>
