@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能AI助手 - 图像识别</title>
+    <style>
+        /* 全局样式 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+            background: #ffffff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            color: #000;
+            overflow: hidden;
+        }
+
+        /* 顶部导航栏 */
+        .top-bar {
+            padding: 14px 20px;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .back-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #4a90e2;
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .back-btn:hover {
+            background: #357abd;
+        }
+
+        /* 聊天区域 */
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background: #f8f9fa;
+        }
+
+        .message {
+            max-width: 75%;
+            padding: 0;
+            border-radius: 12px;
+            line-height: 1.6;
+            word-wrap: break-word;
+            position: relative;
+        }
+
+        .message-content {
+            padding: 16px 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .user {
+            align-self: flex-end;
+        }
+
+        .user .message-content {
+            background: #90caf9;
+            color: #000;
+            border-bottom-right-radius: 4px;
+        }
+
+        .assistant {
+            align-self: flex-start;
+        }
+
+        .assistant .message-content {
+            background: #ffffff;
+            color: #000;
+            border: 1px solid #e0e0e0;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-header {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #666;
+        }
+
+        .user .message-header {
+            color: #1976d2;
+        }
+
+        .assistant .message-header {
+            color: #666;
+        }
+
+        .message img {
+            max-width: 300px;
+            border-radius: 8px;
+            display: block;
+            margin-top: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 输入框样式 */
+        .input-box {
+            display: flex;
+            padding: 16px 20px;
+            background: #ffffff;
+            border-top: 1px solid #e0e0e0;
+            gap: 12px;
+        }
+
+        input[type="file"] {
+            flex: 1;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            padding: 10px 14px;
+            background: #ffffff;
+            color: #000;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            font-size: 14px;
+        }
+
+        input[type="file"]:focus {
+            outline: none;
+            border-color: #4a90e2;
+        }
+
+        input[type="file"]::file-selector-button {
+            border: none;
+            background: #4a90e2;
+            padding: 8px 16px;
+            border-radius: 6px;
+            color: #fff;
+            cursor: pointer;
+            font-weight: 500;
+            margin-right: 12px;
+            transition: background 0.2s;
+        }
+
+        input[type="file"]::file-selector-button:hover {
+            background: #357abd;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            background: #4a90e2;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #357abd;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c0c0c0;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a0a0a0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 顶部返回按钮 -->
+    <div class="top-bar">
+        <button class="back-btn" onclick="window.location.href='/menu'">← 返回</button>
+    </div>
+
+    <!-- 聊天消息容器 -->
+    <div class="chat-container" id="chat-container"></div>
+
+    <!-- 图片上传表单 -->
+    <form class="input-box" id="upload-form">
+        <input type="file" id="image-input" accept="image/*" required>
+        <button type="submit">发送图片</button>
+    </form>
+
+    <script>
+        const chatContainer = document.getElementById('chat-container');
+        const uploadForm = document.getElementById('upload-form');
+        const imageInput = document.getElementById('image-input');
+
+        function appendMessage(role, content, imageUrl = null) {
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('message', role);
+
+            const contentDiv = document.createElement('div');
+            contentDiv.classList.add('message-content');
+            
+            const headerDiv = document.createElement('div');
+            headerDiv.classList.add('message-header');
+            headerDiv.textContent = role === 'user' ? '你' : 'AI';
+            
+            const textDiv = document.createElement('div');
+            textDiv.textContent = content;
+            
+            contentDiv.appendChild(headerDiv);
+            contentDiv.appendChild(textDiv);
+
+            if (imageUrl) {
+                const img = document.createElement('img');
+                img.src = imageUrl;
+                contentDiv.appendChild(img);
+            }
+
+            msgDiv.appendChild(contentDiv);
+            chatContainer.appendChild(msgDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!imageInput.files.length) return;
+
+            const file = imageInput.files[0];
+            const reader = new FileReader();
+            reader.onload = async function(event) {
+                const base64Url = event.target.result;
+                const base64Data = base64Url.split(',')[1];
+
+                appendMessage('user', `已上传图片: ${file.name}`, base64Url);
+
+                const payload = { filename: file.name, image: base64Data };
+
+                try {
+                    const response = await fetch('/upload/send', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) throw new Error("上传失败");
+
+                    const data = await response.json();
+                    const aiText = `识别结果: ${data.class_name} (置信度: ${Math.round(data.confidence * 100)}%)`;
+                    appendMessage('assistant', aiText);
+
+                } catch (err) {
+                    appendMessage('assistant', `[错误] 无法连接到服务器或上传失败: ${err.message}`);
+                }
+
+                imageInput.value = '';
+            };
+
+            reader.readAsDataURL(file);
+        });
+    </script>
+
+</body>
+</html>
